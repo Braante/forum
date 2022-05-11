@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet"type="text/css" href="static/style.css"/>
+    <title>Forum</title>
+</head>
+<script>
+    function actionLikeDislike(like_or_dislike_req,id_post_req,id_comment_req){
+        fetch("/like_dislike", {
+            method: 'POST',
+            body: JSON.stringify({
+                like_or_dislike: like_or_dislike_req,
+                id_post: id_post_req,
+                id_comment: id_comment_req,
+            }),
+        })
+		window.location.reload();
+    }
+</script>
+<body>
+    <div class="header">
+        <h1>Forum</h1>
+        <div class="floatright">
+            <div class="marginbottom" id="disappear">
+                <a href="authentication">Register</a>
+                <a href="login">Login</a>
+            </div>
+            <h1 class="marginbottom marginbottom">{{.Username}}</h1>
+            <a class="marginleft" id="logout" href="logout">↦🚪 Logout</a>
+        </div>
+    </div>
+    <div>
+        <div class="marginleft20px">
+            <div class="displayflex marginbottom">
+                <div>
+                    <form action="/postcreation" method="GET">
+                        <button class="submitbutton margin" type="submit" value="create_post">create post</button>
+                    </form>
+                </div>
+                <div>
+                    <form action="/activity" method="GET">
+                        <button class="submitbutton margin" type="submit">Activity</button>
+                    </form>
+                </div>
+                <div>
+                    <form action="/" method="POST">
+                        <SELECT class="submitbutton" id="category" name="category" size="1">
+                            <option value="" disabled selected>Choose a category</option>
+                            <OPTION>all</OPTION>
+                            <OPTION>politic</OPTION>
+                            <OPTION>sport</OPTION>
+                            <OPTION>entertainment</OPTION>
+                            <OPTION>others</OPTION>
+                        </SELECT>
+                        <button class="submitbutton" type="submit" value="filter">filter</button>
+                </div>
+                    <button class="submitbutton" type="submit" name="created_posts" value="created_posts"> created posts </button>
+			        <button class="submitbutton" type="submit" name="liked_posts" value="liked_posts"> liked posts </button>
+            </form>
+                    <a class="none marginleft" href="/">↻</a>
+            </div>
+                {{range .DataTab}}
+                    <div class="this_posts">
+                        <div class="displayflex marginbottom">
+                            <div id="cat{{.Category}}" class="category1">{{ .Category}}</div>
+                            <div class="account">{{ .Title}}</div>
+                        </div>
+                        <div class="this_is_title marginbottom">
+                            by {{ .Id_account}}
+                        </div>
+                        <div class="serifless marginleft10px">
+                        {{ .Texts}}  
+                        </div> 
+                        <div class="marginbottom" id="Pic{{.Picture}}" >         
+                        <img class="photo marginbottom" src="{{.Picture}}" width="100px">
+                        </div>
+                        <script>
+                            var like = "like"
+                            var dislike = "dislike"
+                        </script>
+                        <button class="none" id="{{.Id_post}}" onclick="actionLikeDislike(like,this.id,null)">👍 </button><label>{{.Like}}</label>
+                        <button class="none marginbottom" id="{{.Id_post}}" onclick="actionLikeDislike(dislike,this.id,null)">👎 </button><label>{{.Dislike}}</label>
+                        <div id="{{.One_comment_id}}" class="this_comment" >
+                            <h1 class="fontsize15px">Last comment:</h1>
+                            <div class="this_is_title">{{.One_comment_author}}</div>
+                            <div name="salut" class="comment_to_post">{{.One_comment}}</div>
+                        </div>
+                        <form action="/comment" method="POST">
+                            <input type="hidden" id="uuid_post" name="uuid_post" value="{{.Id_post}}">
+                            <button class="sub_button" type="submit" value="more_comments">view comments section</button>
+                        </form>
+                    </div>
+                    <script>
+                        var toDelPic = document.getElementById("Pic");
+                        var toDelCat = document.getElementById("cat");
+                        var toDel = document.getElementById("no");
+                        if (toDel != null){
+                            toDel.remove();
+                        }
+                        if (toDelPic != null){
+                            toDelPic.remove();
+                        }
+                        if (toDelCat != null){
+                            toDelCat.remove();
+                        }
+                    </script>
+                {{ end }}
+        </div>
+    </div>
+</body>
+<script>
+    if (document.cookie.match(/^(.*;)?\s*uuid_hash\s*=\s*[^;]+(.*)?$/)){
+        document.getElementById('disappear').remove();
+    }else{
+        document.getElementById('logout').remove();
+    }
+</script>
+</html>
